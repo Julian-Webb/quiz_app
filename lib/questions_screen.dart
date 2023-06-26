@@ -17,8 +17,10 @@ class QuestionsScreen extends StatefulWidget {
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
   late List<int> questionOrder;
+  late List<List<int>> answerOrders;
   late int nQuestions;
   int questionCount = 0;
+  int nAnswers = 4;
 
   @override
   void initState() {
@@ -29,6 +31,17 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     questionOrder =
         List<int>.generate(nQuestions, (int index) => index, growable: true);
     questionOrder.shuffle();
+
+    // generate an order for the answers to the questions and shuffle randomly
+    // we want a list the length of the number of questions that contains
+    // lists from 1 to 4 in random order representing the order of the answers
+    answerOrders =
+        List.generate(nQuestions, (_) => List<int>.filled(nAnswers, 0));
+    for (int i = 0; i < nQuestions; i++) {
+      List<int> answerOrder = List.generate(nAnswers, (index) => index);
+      answerOrder.shuffle();
+      answerOrders[i] = answerOrder;
+    }
   }
 
   void nextQuestion() {
@@ -36,15 +49,17 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     if (questionCount < nQuestions) {
       setState(() {});
     } else {
-      // we want to go to the end screen
+      // we want to go to the summary screen
+      print("No more questions");
     }
   }
 
   @override
   build(context) {
-    // select the next question and delete it from the list
-    QuizQuestion quizQuestion = questions[questionOrder[0]];
-    questionOrder.removeAt(0);
+    // select the next question
+    QuizQuestion quizQuestion = questions[questionOrder[questionCount]];
+    // get the answerOrder for this question
+    List<int> answerOrder = answerOrders[questionCount];
 
     return Center(
       child: Column(
@@ -61,28 +76,28 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
             onPressed: nextQuestion,
-            child: Text(quizQuestion.answers[0]),
+            child: Text(quizQuestion.answers[answerOrder[0]]),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
             onPressed: nextQuestion,
-            child: Text(quizQuestion.answers[1]),
+            child: Text(quizQuestion.answers[answerOrder[1]]),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
             onPressed: nextQuestion,
-            child: Text(quizQuestion.answers[2]),
+            child: Text(quizQuestion.answers[answerOrder[2]]),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
             onPressed: nextQuestion,
-            child: Text(quizQuestion.answers[3]),
+            child: Text(quizQuestion.answers[answerOrder[3]]),
           ),
         ],
       ),
