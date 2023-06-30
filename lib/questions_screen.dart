@@ -5,7 +5,9 @@ import 'package:quiz_app/data/questions.dart';
 import 'package:quiz_app/models/quiz_question.dart';
 
 class QuestionsScreen extends StatefulWidget {
-  const QuestionsScreen({super.key});
+  final void Function(List<int>, List<String>, List<String>) endQuiz;
+
+  const QuestionsScreen(this.endQuiz, {super.key});
 
   // what does this do?
   // it is called when the object is initialized and creates the first state
@@ -16,11 +18,17 @@ class QuestionsScreen extends StatefulWidget {
 }
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
-  late List<int> questionOrder;
-  late List<List<int>> answerOrders;
-  late int nQuestions;
-  int questionCount = 0;
-  int nAnswers = 4;
+  late List<int> questionOrder; // the order of the questions
+  late List<List<int>>
+      answerOrders; // the order of the answers for each question
+  late int nQuestions; // the number of questions
+  int questionCount = 0; // how many questions were currently asked
+  int nAnswers = 4; // the number of answers per question
+
+  // which answers were given to each question
+  List<String> answersGiven = List<String>.empty(growable: true);
+  // the correct answers for each question
+  List<String> correctAnswers = List<String>.empty(growable: true);
 
   @override
   void initState() {
@@ -44,13 +52,20 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     }
   }
 
-  void nextQuestion() {
+  void nextQuestion(answerGiven) {
     questionCount++;
+    answersGiven.add(answerGiven);
     if (questionCount < nQuestions) {
       setState(() {});
     } else {
+      // ignore: avoid_print
+      print("==========================");
+      // ignore: avoid_print
+      print(" quiz will end ");
+      // ignore: avoid_print
+      print("==========================");
       // we want to go to the summary screen
-      print("No more questions");
+      widget.endQuiz(questionOrder, answersGiven, correctAnswers);
     }
   }
 
@@ -60,6 +75,8 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     QuizQuestion quizQuestion = questions[questionOrder[questionCount]];
     // get the answerOrder for this question
     List<int> answerOrder = answerOrders[questionCount];
+    // add correct answers to list (it's always at index 0)
+    correctAnswers.add(quizQuestion.answers[0]);
 
     return Center(
       child: Column(
@@ -75,28 +92,36 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
-            onPressed: nextQuestion,
+            onPressed: () {
+              nextQuestion(quizQuestion.answers[answerOrder[0]]);
+            },
             child: Text(quizQuestion.answers[answerOrder[0]]),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
-            onPressed: nextQuestion,
+            onPressed: () {
+              nextQuestion(quizQuestion.answers[answerOrder[1]]);
+            },
             child: Text(quizQuestion.answers[answerOrder[1]]),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
-            onPressed: nextQuestion,
+            onPressed: () {
+              nextQuestion(quizQuestion.answers[answerOrder[2]]);
+            },
             child: Text(quizQuestion.answers[answerOrder[2]]),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color.fromARGB(158, 102, 102, 102),
                 foregroundColor: Colors.white),
-            onPressed: nextQuestion,
+            onPressed: () {
+              nextQuestion(quizQuestion.answers[answerOrder[3]]);
+            },
             child: Text(quizQuestion.answers[answerOrder[3]]),
           ),
         ],

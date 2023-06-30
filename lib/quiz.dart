@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_app/questions_screen.dart';
 import 'package:quiz_app/start_screen.dart';
+import 'package:quiz_app/summary_screen.dart';
 
 // should contain materialapp
 class Quiz extends StatefulWidget {
@@ -13,7 +14,7 @@ class Quiz extends StatefulWidget {
 }
 
 class _QuizState extends State<Quiz> {
-  // the ? tells Dart that the variable may contani a Widget OR null
+  // the ? tells Dart that the variable may contain a Widget OR null
   Widget? currentScreen;
 
   // the following method is so that startQuiz is initialized before the
@@ -29,9 +30,25 @@ class _QuizState extends State<Quiz> {
     // setState makes flutter rexecute the build method
     setState(
       () {
-        currentScreen = const QuestionsScreen();
+        currentScreen = QuestionsScreen(endQuiz);
       },
     );
+  }
+
+  void endQuiz(List<int> questionOrder, List<String> answersGiven,
+      List<String> correctAnswers) {
+    setState(
+      () {
+        currentScreen = SummaryScreen(
+            questionOrder, answersGiven, correctAnswers, restartQuiz);
+      },
+    );
+  }
+
+  void restartQuiz() {
+    setState(() {
+      currentScreen = StartScreen(startQuiz);
+    });
   }
 
   @override
